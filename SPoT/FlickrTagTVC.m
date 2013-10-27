@@ -9,7 +9,7 @@
 #import "FlickrTagTVC.h"
 #import "FlickrFetcher.h"
 
-@interface FlickrTagTVC ()
+@interface FlickrTagTVC () <UISplitViewControllerDelegate>
 
 @end
 
@@ -25,7 +25,7 @@
     NSMutableDictionary *photosByTag = [NSMutableDictionary dictionary];
     for (NSDictionary *photo in self.photos) {
         for (NSString *tag in [photo[FLICKR_TAGS] componentsSeparatedByString:@" "]) {
-            if ([tag isEqualToString:@"cs193pSPoT"]) continue;
+            if ([tag isEqualToString:@"cs193pspot"]) continue;
             if ([tag isEqualToString:@"portrait"]) continue;
             if ([tag isEqualToString:@"landscape"]) continue;
             NSMutableArray *photos = [photosByTag objectForKey:tag];
@@ -38,6 +38,18 @@
     }
     self.photosByTag = photosByTag;
 }
+
+#pragma mark - UISplitViewControllerDelegate
+
+- (void)awakeFromNib {
+    self.splitViewController.delegate = self;
+}
+
+- (BOOL)splitViewController:(UISplitViewController *)svc shouldHideViewController:(UIViewController *)vc inOrientation:(UIInterfaceOrientation)orientation {
+    return NO;
+}
+
+#pragma mark - segue
 
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([sender isKindOfClass:[UITableViewCell class]]) {

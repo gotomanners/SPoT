@@ -16,12 +16,23 @@
 
 @implementation StanfordFlickrTagsTVC
 
+- (void)loadPhotosFromFlickr {
+    [self.refreshControl beginRefreshing];
+    dispatch_queue_t loaderQ = dispatch_queue_create("Flickr Loader", NULL);
+    dispatch_async(loaderQ, ^{
+        NSArray *stanfordPhotos = [FlickrFetcher stanfordPhotos];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            self.photos = stanfordPhotos;
+            [self.refreshControl endRefreshing];
+        });
+    });
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-	NSArray *stanfordPhotos = [FlickrFetcher stanfordPhotos];
-//    self.tags = [self getAndSortTagDataFromPhotos:stanfordPhotos];
-    self.photos = stanfordPhotos;
+    [self.refreshControl addTarget:self action:@selector(loadPhotosFromFlickr) forControlEvents:UIControlEventValueChanged];
+    [self loadPhotosFromFlickr];
 }
 
 - (NSArray *) getAndSortTagDataFromPhotos:(NSArray *) photos {
